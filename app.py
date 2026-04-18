@@ -2,17 +2,13 @@ import streamlit as st
 from openai import OpenAI
 from bs4 import BeautifulSoup
 import requests
+import os
 
 # ------------------------
-# Config
+# Config (OpenAI)
 # ------------------------
-OLLAMA_BASE_URL = "http://localhost:11434/v1"
-MODEL = "llama3.2:1b"
-
-client = OpenAI(
-    base_url=OLLAMA_BASE_URL,
-    api_key="ollama"
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+MODEL = "gpt-4o-mini"
 
 # ------------------------
 # Scraper
@@ -36,7 +32,7 @@ def summarize(url):
     response = client.chat.completions.create(
         model=MODEL,
         messages=[
-            {"role": "system", "content": "Summarize this website briefly."},
+            {"role": "system", "content": "You are a helpful assistant that summarizes websites clearly."},
             {"role": "user", "content": content}
         ]
     )
@@ -52,8 +48,8 @@ url = st.text_input("Enter website URL")
 
 if st.button("Summarize"):
     if url:
-        st.write("⏳ Processing...")
-        summary = summarize(url)
+        with st.spinner("⏳ Processing..."):
+            summary = summarize(url)
         st.markdown(summary)
     else:
         st.warning("Please enter a URL")
