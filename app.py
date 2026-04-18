@@ -55,10 +55,10 @@ def summarize(url, style, custom):
 # ------------------------
 # UI
 # ------------------------
-st.set_page_config(page_title="Website Summarizer AI", layout="wide")
+st.set_page_config(page_title="Website Summarizer", layout="wide")
 
-st.title("🌐 Website Summarizer AI")
-st.caption("Summarize any website with AI + preview it live")
+st.title("🌐 Website Summarizer")
+st.caption("Summarize any website + preview it live")
 
 url = st.text_input("Enter website URL")
 
