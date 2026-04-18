@@ -3,6 +3,7 @@ from openai import OpenAI
 from bs4 import BeautifulSoup
 import requests
 import os
+import streamlit.components.v1 as components
 
 # ------------------------
 # Config (OpenAI)
@@ -42,6 +43,7 @@ def summarize(url):
 # ------------------------
 # UI
 # ------------------------
+
 st.title("🌐 Website Summarizer AI")
 
 url = st.text_input("Enter website URL")
@@ -50,6 +52,21 @@ if st.button("Summarize"):
     if url:
         with st.spinner("⏳ Processing..."):
             summary = summarize(url)
+
+        # 🧠 Summary section
+        st.subheader("🧠 Summary")
         st.markdown(summary)
+
+        st.divider()
+
+        # 🌐 Website Preview
+        st.subheader("🌐 Website Preview")
+
+        components.iframe(
+            url,
+            height=400,   # small height (scrollable)
+            scrolling=True
+        )
+
     else:
         st.warning("Please enter a URL")
