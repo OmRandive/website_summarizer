@@ -30,6 +30,8 @@ if st.button("Summarize"):
             summary = summarize(content, style, custom)
             original_len = len(content)
             summary_len = len(summary)
+            compression = round((summary_len / original_len) * 100, 2)
+            processing_time = round(end_time - start_time, 2)
         st.session_state.history.append({
             "url": url,
             "summary": summary
