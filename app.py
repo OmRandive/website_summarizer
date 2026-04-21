@@ -53,8 +53,7 @@ if st.button("Summarize"):
     end_time = time.time()
 
 
-compression = round((summary_len / original_len) * 100, 2)
-processing_time = round(end_time - start_time, 2)
+
 st.subheader("📊 Analysis")
 
 colA, colB, colC, colD = st.columns(4)
