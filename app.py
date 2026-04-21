@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 from scraper import fetch_website_contents
 from summarizer import summarize
 import time
+from fpdf import FPDF
 
 # ------------------------
 # Session state
@@ -12,6 +13,16 @@ if "history" not in st.session_state:
 
 if "metrics" not in st.session_state:
     st.session_state.metrics = None
+
+def create_pdf(text):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    for line in text.split("\n"):
+        pdf.multi_cell(0, 8, line)
+
+    return pdf.output(dest="S").encode("latin-1")
 
 # ------------------------
 # UI
@@ -73,6 +84,28 @@ if st.button("Summarize"):
         with col1:
             st.subheader("Summary")
             st.markdown(summary)
+
+    # ------------------------
+    # Download buttons
+    # ------------------------
+
+    # TXT download
+            st.download_button(
+                label="📄 Download as TXT",
+                data=summary,
+                file_name="summary.txt",
+                mime="text/plain"
+            )
+
+    # PDF download
+            pdf_data = create_pdf(summary)
+
+            st.download_button(
+                label="📕 Download as PDF",
+                data=pdf_data,
+                file_name="summary.pdf",
+                mime="application/pdf"
+            )
 
         with col2:
             st.subheader("Preview")
