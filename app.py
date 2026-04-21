@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from scraper import fetch_website_contents
 from summarizer import summarize
+import time
 if "history" not in st.session_state:
     st.session_state.history = []
 
@@ -22,6 +23,7 @@ custom = st.text_input(
 )
 
 if st.button("Summarize"):
+    start_time = time.time()
     if url:
         with st.spinner("Processing..."):
             content = fetch_website_contents(url)
@@ -42,9 +44,24 @@ if st.button("Summarize"):
         with col2:
             st.subheader("Preview")
             components.iframe(url, height=500)
-
+        
     else:
         st.warning("Enter a URL")
+
+    end_time = time.time()
+
+original_len = len(content)
+summary_len = len(summary)
+compression = round((summary_len / original_len) * 100, 2)
+processing_time = round(end_time - start_time, 2)
+st.subheader("📊 Analysis")
+
+colA, colB, colC, colD = st.columns(4)
+
+colA.metric("Original Length", original_len)
+colB.metric("Summary Length", summary_len)
+colC.metric("Compression %", f"{compression}%")
+colD.metric("Time Taken", f"{processing_time}s")
 
 st.divider()
 st.subheader("🕘 History")
