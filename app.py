@@ -28,8 +28,8 @@ if st.button("Summarize"):
         with st.spinner("Processing..."):
             content = fetch_website_contents(url)
             summary = summarize(content, style, custom)
-
-        # ✅ Save to history
+            original_len = len(content)
+            summary_len = len(summary)
         st.session_state.history.append({
             "url": url,
             "summary": summary
@@ -50,8 +50,7 @@ if st.button("Summarize"):
 
     end_time = time.time()
 
-original_len = len(content)
-summary_len = len(summary)
+
 compression = round((summary_len / original_len) * 100, 2)
 processing_time = round(end_time - start_time, 2)
 st.subheader("📊 Analysis")
