@@ -5,32 +5,33 @@ from summarizer import summarize
 import time
 from fpdf import FPDF
 
-# ------------------------
-# Session state
-# ------------------------
+# --- Initialize session state ---
 if "history" not in st.session_state:
     st.session_state.history = []
 
 if "metrics" not in st.session_state:
     st.session_state.metrics = None
 
+# --- Create PDF from text ---
 def create_pdf(text):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    for line in text.split("\n"):
+    # remove unsupported unicode chars
+    clean_text = text.encode("latin-1", "ignore").decode("latin-1")
+
+    for line in clean_text.split("\n"):
         pdf.multi_cell(0, 8, line)
 
     return pdf.output(dest="S").encode("latin-1")
 
-# ------------------------
-# UI
-# ------------------------
+# --- Page setup ---
 st.set_page_config(page_title="Website Summarizer AI", layout="wide")
 
 st.title("🌐 Website Summarizer AI")
 
+# --- User inputs ---
 url = st.text_input("Enter website URL")
 
 style = st.selectbox(
@@ -43,9 +44,7 @@ custom = st.text_input(
     placeholder="e.g., make it funny, focus on key points..."
 )
 
-# ------------------------
-# Button logic
-# ------------------------
+# --- Generate summary ---
 if st.button("Summarize"):
     if url:
         start_time = time.time()
@@ -56,13 +55,13 @@ if st.button("Summarize"):
 
         end_time = time.time()
 
-        # ✅ Metrics
+        # compute metrics
         original_len = len(content)
         summary_len = len(summary)
         compression = round((summary_len / original_len) * 100, 2)
         processing_time = round(end_time - start_time, 2)
 
-        # ✅ Save metrics
+        # store metrics annd history
         st.session_state.metrics = {
             "original_len": original_len,
             "summary_len": summary_len,
@@ -70,38 +69,30 @@ if st.button("Summarize"):
             "processing_time": processing_time
         }
 
-        # ✅ Save history
         st.session_state.history.append({
             "url": url,
             "summary": summary
         })
 
-        # ------------------------
-        # Output
-        # ------------------------
+        # --- Output layout ---
         col1, col2 = st.columns(2)
 
         with col1:
             st.subheader("Summary")
             st.markdown(summary)
 
-    # ------------------------
-    # Download buttons
-    # ------------------------
-
-    # TXT download
+            # download options
             st.download_button(
-                label="📄 Download as TXT",
+                "📄 Download as TXT",
                 data=summary,
                 file_name="summary.txt",
                 mime="text/plain"
             )
 
-    # PDF download
             pdf_data = create_pdf(summary)
 
             st.download_button(
-                label="📕 Download as PDF",
+                "📕 Download as PDF",
                 data=pdf_data,
                 file_name="summary.pdf",
                 mime="application/pdf"
@@ -114,9 +105,7 @@ if st.button("Summarize"):
     else:
         st.warning("Enter a URL")
 
-# ------------------------
-# Metrics display
-# ------------------------
+# --- Metrics display ---
 if st.session_state.metrics:
     st.subheader("📊 Analysis")
 
@@ -127,9 +116,7 @@ if st.session_state.metrics:
     colC.metric("Compression %", f"{st.session_state.metrics['compression']}%")
     colD.metric("Time Taken", f"{st.session_state.metrics['processing_time']}s")
 
-# ------------------------
-# History
-# ------------------------
+# --- History section ---
 st.divider()
 st.subheader("🕘 History")
 
@@ -140,9 +127,7 @@ if st.session_state.history:
 else:
     st.write("No history yet.")
 
-# ------------------------
-# Clear history
-# ------------------------
+# --- Clear history ---
 if st.button("Clear History"):
     st.session_state.history = []
     st.session_state.metrics = None
