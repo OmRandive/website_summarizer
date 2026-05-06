@@ -100,7 +100,7 @@ if st.button("Summarize"):
 
         with col2:
             st.subheader("Preview")
-            components.iframe(url, height=500)
+            components.iframe(url, height=500, scrolling=True)
 
     else:
         st.warning("Enter a URL")
